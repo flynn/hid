@@ -30,7 +30,8 @@ import (
 	"unsafe"
 )
 
-func ioReturnToErr(ret C.IOReturn) error {
+func ioReturnToErr(ret_ C.IOReturn) error {
+	ret := uint64(ret_)
 	switch ret {
 	case C.kIOReturnSuccess:
 		return nil
