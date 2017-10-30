@@ -31,7 +31,7 @@ import (
 )
 
 func ioReturnToErr(ret C.IOReturn) error {
-	switch uint64(ret) {
+	switch ret {
 	case C.kIOReturnSuccess:
 		return nil
 	case C.kIOReturnError:
