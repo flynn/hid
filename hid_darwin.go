@@ -1,11 +1,10 @@
 package hid
 
 /*
-#cgo LDFLAGS: -L . -L/usr/local/lib -framework CoreFoundation -framework IOKit -fconstant-cfstrings
-
+#cgo CFLAGS: -fconstant-cfstrings
+#cgo LDFLAGS: -L . -L/usr/local/lib -framework CoreFoundation -framework IOKit 
 #include <IOKit/hid/IOHIDManager.h>
 #include <CoreFoundation/CoreFoundation.h>
-
 
 static inline CFIndex cfstring_utf8_length(CFStringRef str, CFIndex *need) {
   CFIndex n, usedBufLen;
@@ -164,7 +163,7 @@ func cfstring(s string) C.CFStringRef {
 }
 
 func gostring(cfs C.CFStringRef) string {
-	if cfs == nil {
+	if cfs == 0 {
 		return ""
 	}
 
@@ -189,7 +188,7 @@ func gostring(cfs C.CFStringRef) string {
 func getIntProp(device C.IOHIDDeviceRef, key C.CFStringRef) int32 {
 	var value int32
 	ref := C.IOHIDDeviceGetProperty(device, key)
-	if ref == nil {
+	if ref == 0 {
 		return 0
 	}
 	if C.CFGetTypeID(ref) != C.CFNumberGetTypeID() {
@@ -218,7 +217,8 @@ func iterateDevices(action func(device C.IOHIDDeviceRef) bool) cleanupDeviceMana
 	C.IOHIDManagerOpen(mgr, C.kIOHIDOptionsTypeNone)
 
 	allDevicesSet := C.IOHIDManagerCopyDevices(mgr)
-	defer C.CFRelease(C.CFTypeRef(allDevicesSet))
+	// Temporarily disabled
+    //defer C.CFRelease(C.CFTypeRef(allDevicesSet))
 	devCnt := C.CFSetGetCount(allDevicesSet)
 	allDevices := make([]unsafe.Pointer, uint64(devCnt))
 	C.CFSetGetValues(allDevicesSet, &allDevices[0])
@@ -230,7 +230,8 @@ func iterateDevices(action func(device C.IOHIDDeviceRef) bool) cleanupDeviceMana
 	}
 	return func() {
 		C.IOHIDManagerClose(mgr, C.kIOHIDOptionsTypeNone)
-		C.CFRelease(C.CFTypeRef(mgr))
+		// Temporarily disabled
+        //C.CFRelease(C.CFTypeRef(mgr))
 	}
 }
 
@@ -334,7 +335,7 @@ func (dev *osxDevice) close(disconnected bool) {
 	delete(deviceCtx, dev.osDevice)
 	deviceCtxMtx.Unlock()
 	C.CFRelease(C.CFTypeRef(dev.osDevice))
-	dev.osDevice = nil
+	dev.osDevice = 0
 	dev.closeDM()
 	dev.disconnected = true
 }
