@@ -1,5 +1,9 @@
 package hid
 
+// You may need to expressly allow the 'constant-cflags' flag when
+// building this.  Eg:
+//   $ CGO_LDFLAGS_ALLOW='-fconstant-cfstrings' go build
+
 /*
 #cgo LDFLAGS: -L . -L/usr/local/lib -framework CoreFoundation -framework IOKit -fconstant-cfstrings
 
@@ -164,7 +168,7 @@ func cfstring(s string) C.CFStringRef {
 }
 
 func gostring(cfs C.CFStringRef) string {
-	if cfs == nil {
+	if cfs == 0 {
 		return ""
 	}
 
@@ -189,7 +193,7 @@ func gostring(cfs C.CFStringRef) string {
 func getIntProp(device C.IOHIDDeviceRef, key C.CFStringRef) int32 {
 	var value int32
 	ref := C.IOHIDDeviceGetProperty(device, key)
-	if ref == nil {
+	if ref == 0 {
 		return 0
 	}
 	if C.CFGetTypeID(ref) != C.CFNumberGetTypeID() {
@@ -218,7 +222,7 @@ func iterateDevices(action func(device C.IOHIDDeviceRef) bool) cleanupDeviceMana
 	C.IOHIDManagerOpen(mgr, C.kIOHIDOptionsTypeNone)
 
 	allDevicesSet := C.IOHIDManagerCopyDevices(mgr)
-	defer C.CFRelease(C.CFTypeRef(allDevicesSet))
+	defer C.CFRelease(C.CFTypeRef(unsafe.Pointer(allDevicesSet)))
 	devCnt := C.CFSetGetCount(allDevicesSet)
 	allDevices := make([]unsafe.Pointer, uint64(devCnt))
 	C.CFSetGetValues(allDevicesSet, &allDevices[0])
@@ -230,7 +234,7 @@ func iterateDevices(action func(device C.IOHIDDeviceRef) bool) cleanupDeviceMana
 	}
 	return func() {
 		C.IOHIDManagerClose(mgr, C.kIOHIDOptionsTypeNone)
-		C.CFRelease(C.CFTypeRef(mgr))
+		C.CFRelease(C.CFTypeRef(unsafe.Pointer(mgr)))
 	}
 }
 
@@ -334,7 +338,7 @@ func (dev *osxDevice) close(disconnected bool) {
 	delete(deviceCtx, dev.osDevice)
 	deviceCtxMtx.Unlock()
 	C.CFRelease(C.CFTypeRef(dev.osDevice))
-	dev.osDevice = nil
+	dev.osDevice = 0
 	dev.closeDM()
 	dev.disconnected = true
 }
