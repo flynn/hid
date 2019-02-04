@@ -1,7 +1,7 @@
 package hid
 
 /*
-#cgo LDFLAGS: -lSetupapi -lhid
+#cgo LDFLAGS: -lsetupapi -lhid
 
 #ifdef __MINGW32__
 #include <ntdef.h>
