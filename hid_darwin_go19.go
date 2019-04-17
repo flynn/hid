@@ -12,3 +12,4 @@ var nilCfStringRef C.CFStringRef= nil
 var nilCfTypeRef C.CFTypeRef = nil
 var nilCfSetRef C.CFSetRef = nil
 var nilIOHIDDeviceRef C.IOHIDDeviceRef = nil
+var nilCfDictionaryRef C.CFDictionaryRef = nil
