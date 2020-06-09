@@ -160,7 +160,7 @@ type osxDevice struct {
 
 func cfstring(s string) C.CFStringRef {
 	n := C.CFIndex(len(s))
-	return C.CFStringCreateWithBytes(nil, *(**C.UInt8)(unsafe.Pointer(&s)), n, C.kCFStringEncodingUTF8, 0)
+	return C.CFStringCreateWithBytes(C.kCFAllocatorDefault, *(**C.UInt8)(unsafe.Pointer(&s)), n, C.kCFStringEncodingUTF8, 0)
 }
 
 func gostring(cfs C.CFStringRef) string {
@@ -215,7 +215,7 @@ func getPath(osDev C.IOHIDDeviceRef) string {
 func iterateDevices(action func(device C.IOHIDDeviceRef) bool) cleanupDeviceManagerFn {
 	var mgr C.IOHIDManagerRef
 	mgr = C.IOHIDManagerCreate(C.kCFAllocatorDefault, C.kIOHIDOptionsTypeNone)
-	C.IOHIDManagerSetDeviceMatching(mgr, nil)
+	C.IOHIDManagerSetDeviceMatching(mgr, nilCfDictionaryRef)
 	C.IOHIDManagerOpen(mgr, C.kIOHIDOptionsTypeNone)
 
 	var allDevicesSet C.CFSetRef
