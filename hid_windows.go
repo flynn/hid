@@ -191,7 +191,7 @@ func ByPath(devicePath string) (*DeviceInfo, error) {
 	}
 
 	var attrs C.HIDD_ATTRIBUTES
-	attrs.Size = C.DWORD(unsafe.Sizeof(attrs))
+	attrs.Size = C.ULONG(unsafe.Sizeof(attrs))
 	C.HidD_GetAttributes(dev.h(), &attrs)
 
 	devInfo.VendorID = uint16(attrs.VendorID)
